@@ -2,11 +2,13 @@
 
 A tiny Neovim plugin to toggle the word under the cursor through common pairs and cycles (true/false, on/off, debug/info/warn/error, etc.).
 
+![demo](doc/demo.gif)
+
 ## Features
 
-- Toggle the current word in place with one command.
-- Case-aware replacement: `True -> False`, `DEBUG -> INFO`.
-- Extend or replace the default cycles with your own words.
+- Toggle the current word in place with one command
+- Case-aware replacement: `True -> False`, `DEBUG -> INFO`
+- Extend or replace the default cycles with your own words
 
 ## Requirements
 
@@ -38,7 +40,7 @@ use({
 
 ## Usage
 
-Call `toggle()` on the word under the cursor.
+Bind a keymap to `toggle()`:
 
 ```lua
 vim.keymap.set("n", "<leader>tw", function()
@@ -48,7 +50,7 @@ end, { desc = "Toggle word" })
 
 ## Configuration
 
-You can provide additional cycles via `setup({ dict = { ... } })`.
+Provide extra cycles via `setup({ dict = { ... } })`:
 
 ```lua
 require("Micro-word-toggle").setup({
@@ -82,4 +84,4 @@ todo -> fixme -> note -> hack -> bug
 
 ## License
 
-GPLv3. See `LICENSE`.
+GLPv3. See `LICENSE`.
