@@ -1,3 +1,10 @@
 True
 true
 TRUE
+Hack:
+or
+!=
+
+&&
+&
+

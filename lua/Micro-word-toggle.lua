@@ -1,12 +1,30 @@
 local M = {}
 
--- 1. Define the default 'antonym' dictionary
+-- Define the default 'antonym' dictionary
 -- This is a simple Lua table, with the original wotd on the left and the replacement word on the right
-local default_dict = {
-	["true"] = "false",
-	-- ["false"] = "true",
-	["yes"] = "no",
-	["max"] = "min",
+local default_cycles = {
+  -- basic boolean
+  {"true", "false"},
+  {"yes", "no"},
+  {"on", "off"},
+  {"open", "close"},
+
+  -- compare symbol
+  {"and", "or"},
+
+  {"<", ">"},
+  {"<=", ">="},
+  {"==", "!="},
+  {"&&", "||"},
+  {"&", "|"},
+
+  -- other
+  -- log level
+  {"debug", "info", "warn", "error"},
+  -- variable Modifier
+  {"public", "private", "protected"},
+  -- todo status
+  {"todo", "fixme", "note", "hack", "bug"}
 }
 
 -- Allow users to customize settings (merging the default dictionary with the user dictionary)
@@ -18,21 +36,25 @@ M.setup = function(opts)
 	-- If the user provides pairs, we merge them into the config
 	-- (simplified here, ethier by directly overwriting or appending)
 	opts = opts or {}
-	-- "force" means that if there is a key conflict, the right side (opts.dict) will override the left side (default_dict)
-	local user_dict = vim.tbl_deep_extend("force", {}, default_dict, opts.dict or {})
 
-	-- Automatically generate bidirectional mapping
-	local final_dict = {}
-	for k, v in pairs(user_dict) do
-		-- Forward entry
-		final_dict[k] = v
-		-- Backward entry
-		if not final_dict[v] then
-			final_dict[v] = k
-		end
-	end
+  local all_cycles = vim.list_extend({}, default_cycles)
+  if opts.dict then
+    vim.list_extend(all_cycles, opts.dict)
+  end
 
-	M.config.dict = final_dict
+  local lookup = {}
+  for _, group in ipairs(all_cycles) do
+    for i, word in ipairs(group) do
+      -- Unify the word to lowercase
+      local current_word = word:lower()
+
+      local next_index = (i % #group) + 1
+      local next_val = group[next_index]:lower()
+      lookup[current_word] = next_val
+    end
+  end
+
+	M.config.dict = lookup;
 end
 
 -- Helper function: Adjust new_word according to the case of the first letter of old_word
@@ -62,8 +84,7 @@ M.toggle = function()
 		local final_word = match_case(word, replacement)
 		vim.cmd('normal! "_ciw' .. final_word)
 	else
-		-- print("Debug: Word='"..word.."' Key='"..key.."' Found='"..(replacement or "nil").."'")
-		print("Micro-toggle: No toggle found for '" .. key .. "'")
+		print("Micro-toggle: No toggle found. Word='"..word.."' Key='"..key.."' Found='"..(replacement or "nil").."'")
 	end
 end
 
